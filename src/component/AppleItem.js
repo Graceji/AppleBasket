@@ -2,16 +2,18 @@ import React, { Component } from 'react';
 
 class AppleItem extends Component {
   render() {
+    let { apple, eatApple } = this.props;
+
     return (
       <div className="appleItem">
         <div className="info">
-          <div className="name">红苹果- 1号</div>
+          <div className="name">红苹果- {apple.id}号</div>
           <div className="weight">
-            23克
+            {apple.weight}克
           </div>
         </div>
         <div className="btn-div">
-          <button>吃掉</button>
+          <button onClick={eatApple.bind(this, apple.id)}>吃掉</button>
         </div>
       </div>
     );
