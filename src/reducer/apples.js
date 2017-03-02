@@ -49,6 +49,6 @@ export default handler(initialState, {
       isEaten: false
     };
     const addApple = state.apples.concat(newApple);
-    return Object.assign({}, state, { apples: addApple});
+    return Object.assign({}, state, { apples: addApple}, { isFetching: false });
   }
 });
