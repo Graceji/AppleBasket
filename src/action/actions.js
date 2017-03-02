@@ -1,4 +1,0 @@
-export const BEGIN_PICK_APPLE = "BEGIN_PICK_APPLE";
-export const DONE_PICK_APPLE = "DONE_PICK_APPLE";
-export const FAIL_PICK_APPLE = "FAIL_PICK_APPLE";
-export const EAT_APPLE = "EAT_APPLE";

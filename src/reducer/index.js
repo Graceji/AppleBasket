@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux';
-import appleBasketReducer from './appleBasketReducer';
+import appleBasket from './apples';
 
 const rootReducer = combineReducers({
-  appleBasket: appleBasketReducer
+  appleBasket,
 });
 
 export default rootReducer;

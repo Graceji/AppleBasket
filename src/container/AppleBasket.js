@@ -1,82 +1,69 @@
 import React, { Component } from 'react';
+import AppleStatus from '../components/AppleStatus';
+import AppleList from '../components/AppleList';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import actions from '../action/appleAction';
-import AppleItem from '../component/AppleItem';
+import actions from '../actions';
 
 class AppleBasket extends Component {
-  calculateStatus() {
-    let status = {
-      appleNow: {
-        quantity: 0,
-        weight: 0
-      },
-      appleEaten: {
-        quantity: 0,
-        weight: 0
+  getAppleStatus(apples) {
+    const totalWeight = apples
+                          .reduce((current, next) => ({weight: current.weight + next.weight}))
+                          .weight;
+    let eatenWeight = 0;
+    let eatenLen = 0;
+
+    apples.forEach(apple => {
+      if (apple.isEaten) {
+        eatenWeight += apple.weight;
+        eatenLen += 1;
       }
-    };
-    this.props.appleBasket.apples.forEach(apple => {
-      let selector = apple.isEaten ? 'appleEaten' : 'appleNow';
-      status[selector].quantity ++;
-      status[selector].weight += apple.weight;
     });
-    return status;
+
+    const leftWeight = totalWeight - eatenWeight;
+    const leftLen = apples.length - eatenLen;
+
+    return {
+      eaten: {
+        len: eatenLen,
+        weight: eatenWeight
+      },
+      notEaten: {
+        len: leftLen,
+        weight: leftWeight
+      }
+    }
   }
 
-  getAppleItem(apples) {
-    let data = [];
-    apples.forEach(apple => {
-      if (!apple.isEaten) {
-        data.push(<AppleItem
-                    apple={apple}
-                    key={apple.id}
-                    eatApple={this.props.actions.eatApple}
-                  />);
-      }
-      if (!data.length) data.push(<div>空空如也！</div>)
-    })
-    return data;
+  getAppleLists() {
+    const { appleBasket, actions } = this.props;
+    const notEatenApples = appleBasket.apples.filter(apple => !apple.isEaten);
+    if (notEatenApples.length) {
+      return notEatenApples.map(apple => <AppleList
+                                          key={apple.id}
+                                          apple={apple}
+                                          eatApple={actions.eatApple}
+                                        />)
+    }
+    return <div>空空如也</div>
   }
 
   render() {
-    let { appleBasket, actions } = this.props;
-    let { apples, isPicking } = appleBasket;
-    let status = this.calculateStatus();
-    let {
-      appleNow: {quantity: notEatenQuantity, weight: notEatenWeight},
-      appleEaten: {quantity: eatenQuantity, weight: eatenWeight}
-    } = status;
-
+    const { appleBasket, actions } = this.props;
+    const { eaten, notEaten } = this.getAppleStatus(appleBasket.apples);
     return (
       <div className="appleBasket">
-        <div className="title">
+        <div className="appleBasket__Header">
           苹果篮子
         </div>
-        <div className="status">
-          <div className="section">
-            <div className="head">
-              当前
-            </div>
-            <div className="cotent">
-              {notEatenQuantity}个苹果， {notEatenWeight}克
-            </div>
-          </div>
-          <div className="section">
-            <div className="head">
-              已吃掉
-            </div>
-            <div className="cotent">
-              {eatenQuantity}个苹果， {eatenWeight}克
-            </div>
-          </div>
+        <div className="appleBasket__Status">
+          <AppleStatus text="当前" appleStatus={notEaten} />
+          <AppleStatus text="已吃掉" appleStatus={eaten} />
         </div>
-        <div className="appleList">
-          <div className="empty-tip">
-            {this.getAppleItem(apples)}
-          </div>
+        <div className="appleBasket__Lists">
+          {this.getAppleLists()}
         </div>
-        <div className="btn-div">
+        <div className="appleBasket__Fetch">
           <button onClick={actions.pickApple}>
             摘苹果
           </button>
@@ -86,13 +73,17 @@ class AppleBasket extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  appleBasket: state.appleBasket
-});
+function mapStateToProps(state) {
+  return {
+    appleBasket: state.appleBasket,
+  }
+}
 
-const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(actions, dispatch)
-});
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators(actions, dispatch)
+  };
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppleBasket);
-// export default AppleBasket;
+
